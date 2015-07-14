@@ -1,0 +1,16 @@
+{
+  "name": "angular-countries-capitals",
+  "version": "1.0.0",
+  "description": "An Angular app that displays the countries and their respective capitals",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^10.2.6",
+    "gulp": "^3.9.0",
+    "gulp-connect": "^2.2.0"
+  }
+}
