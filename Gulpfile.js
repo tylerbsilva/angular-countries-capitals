@@ -27,12 +27,12 @@ gulp.task('html', function() {
 
 // JavaScript build task, removes whitespace and concatenates all files
 gulp.task('scripts', function() {
-  return browserify('./app/js/app.js')
+  return browserify('./app/js/main.js')
     .bundle()
     .pipe(source('app.js'))
     .pipe(buffer())
     .pipe(uglify())
-    .pipe(gulp.dest('build/js'));
+    .pipe(gulp.dest('./app/js'));
 });
 
 // Default task

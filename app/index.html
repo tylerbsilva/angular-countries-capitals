@@ -1,11 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="CountriesCapitals">
 <head>
   <meta charset="UTF-8">
-  <meta viewport=""
+  <meta viewport="">
   <title>Countries and Capitals!</title>
+  <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-
+  <header>
+    <h1>Countries and Capitals!</h1>
+  </header>
+  <div class="animate-view-container">
+    <div ng-view class="animate-view"></div>
+  </div>
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script  src="bower_components/angular-route/angular-route.min.js"></script>
+  <script  src="bower_components/angular-animate/angular-animate.min.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
