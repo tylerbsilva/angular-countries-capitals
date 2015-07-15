@@ -24,10 +24,6 @@ body {
   border-right: 2em solid rgb(62, 96, 122);
   border-left: 2em solid rgb(62, 96, 122);
 }
-nav{
-  text-align: center;
-  padding: 1em;
-}
 h1,
 h2 {
   text-align: center;
@@ -55,22 +51,12 @@ table {
 }
 
 td {
-  width: 50%;
+  text-align: right;
   padding: 3px;
 }
 
 td:first-child {
-  font-weight: bold;
-  text-align: right;
-}
-
-form td {
-  padding: .5em;
-}
-
-input {
-  width: 100%;
-  height: 100%;
+  text-align: left;
 }
 
 

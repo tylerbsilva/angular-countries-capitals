@@ -11,11 +11,11 @@
   </thead>
   <tbody ng-repeat="country in countries">
     <tr>
-      <td>{{country.countryName}}</td>
+      <td><span ng-click="countryDetail(country)">{{country.countryName}}</span></td>
       <td>{{country.countryCode}}</td>
       <td>{{country.capital}}</td>
-      <td>{{country.areaInSqKm}}</td>
-      <td>{{country.population}}</td>
+      <td>{{country.areaInSqKm | number}}</td>
+      <td>{{country.population | number}}</td>
       <td>{{country.continentName}}</td>
     </tr>
   </tbody>

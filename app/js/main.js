@@ -32,30 +32,52 @@ app.config(['$routeProvider', function($routeProvider){
       templateUrl: './js/countries/countries.html',
       controller: 'CountriesController'
     })
-    .when('/earnings', {
+    .when('/countries/:country/capital', {
       templateUrl: './js/countries-detail/countries-detail.html',
-      controller: 'MainController'
+      controller: 'CountriesDetailController'
     })
     .otherwise('/');
 }]);
 
 app.factory('dataStore', function(){
+
+
   return {
-    countryList : {}
+    countryList : {},
+    countryDetail : {
+
+    }
   }
 });
 
 app.controller('MainController', ['$scope', '$http','$location', '$route', 'dataStore', function($scope, $http, $location, $route, dataStore){
+  //make call to get country information
   var url = 'http://api.geonames.org/countryInfoJSON?username=tylerbsilva';
   $http({
     url: url,
     method: 'GET'
   }).success(function(data){
+    // store data in factory
     dataStore.countryList = data.geonames;
+    // log data for testing
     console.log(dataStore.countryList);
   });
 }]);
 
 app.controller('CountriesController', ['$scope', '$http','$location', '$route', 'dataStore', function($scope, $http, $location, $route, dataStore){
+  // set countries data
   $scope.countries = dataStore.countryList;
+  // call function to set detail of country
+  $scope.countryDetail = function(country){
+    dataStore.countryDetail.countryName = country.countryName;
+    dataStore.countryDetail.areaInSqKm = country.areaInSqKm;
+    dataStore.countryDetail.countryName = country.capital;
+    $location('#/countries/'+ country.countryName +'/capital')
+  }
+}]);
+
+app.controller('CountriesDetailController', ['$scope', '$http','$location', '$route', 'dataStore', function($scope, $http, $location, $route, dataStore){
+  $scope.countryDetail = dataStore.countryDetail;
+  console.log($scope.countryDetail);
+
 }]);
