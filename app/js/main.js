@@ -39,41 +39,54 @@ app.config(['$routeProvider', function($routeProvider){
     .otherwise('/');
 }]);
 
-app.factory('dataStore', function(){
-
-
-  return {
-    countryList : {},
-    countryDetail : {
-
-    }
-  }
-});
-
-app.controller('MainController', ['$scope', '$http','$location', '$route', 'dataStore', function($scope, $http, $location, $route, dataStore){
-  //make call to get country information
+app.factory('dataStore', ['$http', function($http){
+  // Make HTTP call once and the store data as cache
+  var countryList;
+  var dataFetch = false;
   var url = 'http://api.geonames.org/countryInfoJSON?username=tylerbsilva';
   $http({
     url: url,
     method: 'GET'
   }).success(function(data){
-    // store data in factory
-    dataStore.countryList = data.geonames;
-    // log data for testing
-    console.log(dataStore.countryList);
+    countryList = data.geonames;
+    console.log(countryList);
+    dataFetch = true;
   });
+  return {
+    dataReceived : dataFetch,
+    countries : countryList
+  };
+}]);
+
+app.controller('MainController', ['$scope', '$route', '$q', 'dataStore', function($scope, $route, $q, dataStore){
+  //When button is clicked, change to next page
+  $scope.dataReceived = false;
+  function wait() {
+    var defer = $q.defer();
+    // Simulating doing some asynchronous operation...
+    setTimeout(function(){
+      defer.resolve();
+    }, 2000);
+    return defer.promise;
+  }
+  wait().then(function(){
+    $scope.dataReceived = true;
+  });
+  $scope.browseCountries = function(){
+    $location('#/countries');
+  };
 }]);
 
 app.controller('CountriesController', ['$scope', '$http','$location', '$route', 'dataStore', function($scope, $http, $location, $route, dataStore){
   // set countries data
-  $scope.countries = dataStore.countryList;
+  $scope.countries = dataStore.countries;
   // call function to set detail of country
   $scope.countryDetail = function(country){
     dataStore.countryDetail.countryName = country.countryName;
     dataStore.countryDetail.areaInSqKm = country.areaInSqKm;
     dataStore.countryDetail.countryName = country.capital;
-    $location('#/countries/'+ country.countryName +'/capital')
-  }
+    $location('#/countries/'+ country.countryName +'/capital');
+  };
 }]);
 
 app.controller('CountriesDetailController', ['$scope', '$http','$location', '$route', 'dataStore', function($scope, $http, $location, $route, dataStore){
