@@ -25,15 +25,15 @@ app.run(function($rootScope, $location, $timeout) {
 app.config(['$routeProvider', function($routeProvider){
   $routeProvider
     .when('/', {
-      templateUrl : './js/home/home.html',
+      templateUrl : './js/templates/home.html',
       controller: 'MainController'
     })
     .when('/countries', {
-      templateUrl: './js/countries/countries.html',
+      templateUrl: './js/templates/countries.html',
       controller: 'CountriesController'
     })
     .when('/countries/:country/capital', {
-      templateUrl: './js/countries-detail/countries-detail.html',
+      templateUrl: './js/templates/countries-detail.html',
       controller: 'CountriesDetailController'
     })
     .otherwise('/');
@@ -41,26 +41,38 @@ app.config(['$routeProvider', function($routeProvider){
 
 app.factory('dataStore', ['$http', function($http){
   // Make HTTP call once and the store data as cache
-  var countryList;
-  var dataFetch = false;
-  var url = 'http://api.geonames.org/countryInfoJSON?username=tylerbsilva';
-  $http({
-    url: url,
-    method: 'GET'
-  }).success(function(data){
-    countryList = data.geonames;
-    console.log(countryList);
-    dataFetch = true;
-  });
   return {
-    dataReceived : dataFetch,
-    countries : countryList
-  };
+    getCountries : function(){
+      return $http({
+        url: 'http://api.geonames.org/countryInfoJSON?username=tylerbsilva',
+        method: 'GET'
+      })
+    },
+    getCity : function(city, countryCode){
+      return $http({
+        url: 'http://api.geonames.org/searchJSON',
+        method: 'GET',
+        params: {
+          q: city,
+          country: countryCode,
+          name_equals: city,
+          isNameRequired: true,
+          username: 'tylerbsilva',
+          maxRows: 1
+        }
+      })
+    },
+    countryList : {},
+    countryDetail : {},
+    cityDetail : {}
+  }
 }]);
 
-app.controller('MainController', ['$scope', '$route', '$q', 'dataStore', function($scope, $route, $q, dataStore){
+app.controller('MainController', ['$scope', '$route', '$q', 'dataStore', '$location', function($scope, $route, $q, dataStore, $location){
   //When button is clicked, change to next page
   $scope.dataReceived = false;
+  $scope.countries = [];
+
   function wait() {
     var defer = $q.defer();
     // Simulating doing some asynchronous operation...
@@ -69,28 +81,39 @@ app.controller('MainController', ['$scope', '$route', '$q', 'dataStore', functio
     }, 2000);
     return defer.promise;
   }
+  dataStore.getCountries().success(function(data){
+    dataStore.countryList = data.geonames;
+    $scope.countries = dataStore.countryList;
+  });
   wait().then(function(){
     $scope.dataReceived = true;
   });
+
   $scope.browseCountries = function(){
-    $location('#/countries');
+    $location.path('/countries');
   };
 }]);
 
 app.controller('CountriesController', ['$scope', '$http','$location', '$route', 'dataStore', function($scope, $http, $location, $route, dataStore){
   // set countries data
-  $scope.countries = dataStore.countries;
+  $scope.countries = dataStore.countryList;
   // call function to set detail of country
   $scope.countryDetail = function(country){
+    // grab the city details
+    dataStore.getCity(country.capital, country.countryCode).success(function(data){
+      dataStore.countryDetail.population = data.geonames[0];
+      console.log(dataStore.cityDetail);
+    });
+
     dataStore.countryDetail.countryName = country.countryName;
     dataStore.countryDetail.areaInSqKm = country.areaInSqKm;
-    dataStore.countryDetail.countryName = country.capital;
-    $location('#/countries/'+ country.countryName +'/capital');
+    dataStore.countryDetail.capital = country.capital;
+    dataStore.countryDetail.continentName = country.continent;
+
+    $location.path('/countries/'+ country.countryName +'/capital');
   };
 }]);
 
 app.controller('CountriesDetailController', ['$scope', '$http','$location', '$route', 'dataStore', function($scope, $http, $location, $route, dataStore){
   $scope.countryDetail = dataStore.countryDetail;
-  console.log($scope.countryDetail);
-
 }]);
